@@ -1,7 +1,14 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 import { CopilotWorkspace } from "@/components/copilot/CopilotWorkspace";
+import { getUser } from "@/lib/auth/mock-auth";
 
 export const Route = createFileRoute("/copilot")({
+  ssr: false,
+  beforeLoad: () => {
+    if (typeof window !== "undefined" && !getUser()) {
+      throw redirect({ to: "/auth" });
+    }
+  },
   head: () => ({
     meta: [
       { title: "Aurelia Copilot — Guest Intelligence" },
@@ -9,11 +16,6 @@ export const Route = createFileRoute("/copilot")({
         name: "description",
         content:
           "AI workspace for hotel managers: analyze guest reviews, surface complaints, and turn feedback into action plans.",
-      },
-      { property: "og:title", content: "Aurelia Copilot — Guest Intelligence" },
-      {
-        property: "og:description",
-        content: "Chat with an AI assistant trained on your guest feedback. Sentiment, trends, action plans — instantly.",
       },
     ],
   }),
